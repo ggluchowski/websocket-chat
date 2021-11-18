@@ -95,9 +95,20 @@ p {
   border: none;
   border-radius: 15px 5px 15px 15px;
   padding: 10px 25px;
+  color: rgb(255, 255, 255);
+  font-size: 0.9rem;
+  max-width: 200px;
+}
+
+.message__content--bot {
+  background: rgb(149, 26, 26);
+  border: none;
+  border-radius: 15px 5px 15px 15px;
+  padding: 10px 25px;
   color: #fff;
   font-size: 0.9rem;
   max-width: 200px;
+  font-style: italic;
 }
 
 .message--self .message__content {

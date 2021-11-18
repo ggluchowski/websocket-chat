@@ -7,6 +7,7 @@ class Chat {
     const thisChat = this;
     thisChat.getElements();
     thisChat.initAction();
+    thisChat.initSocket();
   }
 
   getElements() {
@@ -21,8 +22,6 @@ class Chat {
     thisChat.dom.messageContentInput = document.getElementById(settings.messageContent);
   };
 
-
-
   initAction() {
     const thisChat = this;
 
@@ -30,6 +29,7 @@ class Chat {
     const messagesSection = thisChat.dom.messagesSection;
     const messagesList = thisChat.dom.messagesList;
     const messageContentInput = thisChat.dom.messageContentInput;
+    const socket = io();
 
     function addMessage(author, content) {
       const message = document.createElement('li');
@@ -42,12 +42,18 @@ class Chat {
       }
       message.innerHTML = `
         <h3 class="message__author">${userName === author ? 'You' : author}</h3>
-         <div class="message__content">
+         <div class=
+         ${author === 'Chat Bot' ?
+          "message__content--bot" : "message__content"}>
            ${content}
          </div>`;
 
       messagesList.appendChild(message);
     }
+
+    socket.on('message', ({ author, content }) => addMessage(author, content));
+    socket.on('chatBotInfo', ({ author, content }) => addMessage(author, content));
+    socket.on('out', ({ author, content }) => addMessage(author, content));
 
     loginForm.addEventListener('submit', function login(e) {
       e.preventDefault();
@@ -60,24 +66,25 @@ class Chat {
         userName = user;
         loginForm.classList.remove('show');
         messagesSection.classList.add('show');
+        socket.emit('join', { author: userName });
+        socket.emit('chatBotInfo', { author: 'Chat Bot', content: `${userName} has joined the conversation!` });
       }
     });
 
     messagesSection.addEventListener('submit', function sendMessage(e) {
       e.preventDefault();
 
+      let messageContent = messageContentInput.value;
+
       if (messageContentInput.value === '') {
         alert('Pusta wiadomosc...');
       } else {
         addMessage(userName, messageContentInput.value);
+        socket.emit('message', { author: userName, content: messageContent });
         messageContentInput.value = '';
       }
     });
-
-
-
   }
-
 
 }
 
